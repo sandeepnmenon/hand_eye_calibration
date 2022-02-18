@@ -4,7 +4,8 @@ from hand_eye_calibration_module.time_alignment import (
 from hand_eye_calibration_module.quaternion import Quaternion
 from hand_eye_calibration_module.csv_io import (
     write_time_stamped_poses_to_csv_file,
-    read_time_stamped_poses_from_csv_file)
+    read_time_stamped_poses_from_csv_file,
+    write_time_stamped_transformation_matrices)
 
 import argparse
 import numpy as np
@@ -43,6 +44,11 @@ if __name__ == '__main__':
 
     parser.add_argument(
         '--time_offset_output_csv_file', type=str,
+        help='Write estimated time offset to this file in spatial-extrinsics csv format')
+    
+    parser.add_argument(
+        '--aligned_poses_output_numpy', type=bool,
+        default=True,
         help='Write estimated time offset to this file in spatial-extrinsics csv format')
 
     parser.add_argument(
@@ -114,3 +120,12 @@ if __name__ == '__main__':
         from hand_eye_calibration_module.csv_io import write_double_numpy_array_to_csv_file
         write_double_numpy_array_to_csv_file(np.array((time_offset, )),
                                              args.time_offset_output_csv_file)
+
+    if args.aligned_poses_output_numpy is not None:
+        print("Writing aligned poses as transformation matrices to numpy files...")
+        write_time_stamped_transformation_matrices(aligned_poses_B_H, args.aligned_poses_B_H_csv_file.replace(".csv", ".npy"))
+        write_time_stamped_transformation_matrices(aligned_poses_W_E, args.aligned_poses_W_E_csv_file.replace(".csv", ".npy"))
+
+        # Also save the non-aligned poses
+        write_time_stamped_transformation_matrices(time_stamped_poses_B_H, args.poses_B_H_csv_file.replace(".txt", ".npy"))
+        write_time_stamped_transformation_matrices(time_stamped_poses_W_E, args.poses_W_E_csv_file.replace(".txt", ".npy"))

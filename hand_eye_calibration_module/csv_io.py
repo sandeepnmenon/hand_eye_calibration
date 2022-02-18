@@ -43,3 +43,15 @@ def write_time_stamped_poses_to_csv_file(time_stamped_poses, csv_file):
       timestamp [s], x [m], y [m], z [m], qx, qy, qz, qw
     """
     write_double_numpy_array_to_csv_file(time_stamped_poses, csv_file)
+
+
+def write_time_stamped_transformation_matrices(time_stamped_poses, file_path):
+    """
+    Convert time stamped poses to transformation matrices and save them as a numpy file.
+    """
+    from .pose_evaluation_utils import pose_vec_q_to_mat
+    transformation_matrices = []
+    for pose in time_stamped_poses:
+        transformation_matrices.append(pose_vec_q_to_mat(pose))
+    
+    np.save(file_path, np.array(transformation_matrices))
