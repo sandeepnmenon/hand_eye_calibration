@@ -59,6 +59,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--visualize', type=bool, default=False,
                         help='Visualize the poses.')
+    parser.add_argument('--time_scale', type=float, default=1.0)
 
     args = parser.parse_args()
 
@@ -77,23 +78,23 @@ if __name__ == '__main__':
     print("Reading CSV files...")
     (time_stamped_poses_B_H, times_B_H,
      quaternions_B_H) = read_time_stamped_poses_from_csv_file(
-         args.poses_B_H_csv_file, use_JPL_quaternion)
+         args.poses_B_H_csv_file, use_JPL_quaternion, time_scale=args.time_scale)
     print("Found ", time_stamped_poses_B_H.shape[
         0], " poses in file: ", args.poses_B_H_csv_file)
 
     (time_stamped_poses_W_E, times_W_E,
      quaternions_W_E) = read_time_stamped_poses_from_csv_file(
-         args.poses_W_E_csv_file, use_JPL_quaternion)
+         args.poses_W_E_csv_file, use_JPL_quaternion, time_scale=args.time_scale)
     print("Found ", time_stamped_poses_W_E.shape[
         0], " poses in file: ", args.poses_W_E_csv_file)
 
     # Asigning default values to output csv files
     if args.aligned_poses_B_H_csv_file is None:
         args.aligned_poses_B_H_csv_file = args.poses_B_H_csv_file.replace(
-            ".txt", "_aligned.csv")
+            ".csv", "_aligned.csv")
     if args.aligned_poses_W_E_csv_file is None:
         args.aligned_poses_W_E_csv_file = args.poses_W_E_csv_file.replace(
-            ".txt", "_aligned.csv")
+            ".csv", "_aligned.csv")
     print("Computing time offset...")
     filtering_config = FilteringConfig()
     filtering_config.visualize = args.visualize
@@ -109,11 +110,13 @@ if __name__ == '__main__':
         time_stamped_poses_B_H, time_stamped_poses_W_E, time_offset,
         filtering_config.visualize)
 
-    print("Writing aligned poses to CSV files...")
-    write_time_stamped_poses_to_csv_file(aligned_poses_B_H,
-                                         args.aligned_poses_B_H_csv_file)
-    write_time_stamped_poses_to_csv_file(aligned_poses_W_E,
-                                         args.aligned_poses_W_E_csv_file)
+    if len(aligned_poses_B_H) > 0:
+        print("Writing aligned poses to CSV files...")
+        write_time_stamped_poses_to_csv_file(aligned_poses_B_H,
+                                            args.aligned_poses_B_H_csv_file)
+        print(aligned_poses_W_E.dtype)
+        write_time_stamped_poses_to_csv_file(aligned_poses_W_E,
+                                            args.aligned_poses_W_E_csv_file)
 
     if args.time_offset_output_csv_file is not None:
         print("Writing time_offset to %s." % args.time_offset_output_csv_file)
@@ -121,11 +124,11 @@ if __name__ == '__main__':
         write_double_numpy_array_to_csv_file(np.array((time_offset, )),
                                              args.time_offset_output_csv_file)
 
-    if args.aligned_poses_output_numpy is not None:
+    if args.aligned_poses_output_numpy is not None and len(aligned_poses_B_H) > 0:
         print("Writing aligned poses as transformation matrices to numpy files...")
         write_time_stamped_transformation_matrices(aligned_poses_B_H, args.aligned_poses_B_H_csv_file.replace(".csv", ".npy"))
         write_time_stamped_transformation_matrices(aligned_poses_W_E, args.aligned_poses_W_E_csv_file.replace(".csv", ".npy"))
 
         # Also save the non-aligned poses
-        write_time_stamped_transformation_matrices(time_stamped_poses_B_H, args.poses_B_H_csv_file.replace(".txt", ".npy"))
-        write_time_stamped_transformation_matrices(time_stamped_poses_W_E, args.poses_W_E_csv_file.replace(".txt", ".npy"))
+        write_time_stamped_transformation_matrices(time_stamped_poses_B_H, args.poses_B_H_csv_file.replace(".csv", ".npy"))
+        write_time_stamped_transformation_matrices(time_stamped_poses_W_E, args.poses_W_E_csv_file.replace(".csv", ".npy"))

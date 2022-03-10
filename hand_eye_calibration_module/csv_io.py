@@ -3,7 +3,7 @@ import numpy as np
 import csv
 
 
-def read_time_stamped_poses_from_csv_file(csv_file, JPL_quaternion_format=False):
+def read_time_stamped_poses_from_csv_file(csv_file, JPL_quaternion_format=False, skip_header=True, time_scale=1.0):
     """
     Reads time stamped poses from a CSV file.
     Assumes the following line format:
@@ -13,9 +13,12 @@ def read_time_stamped_poses_from_csv_file(csv_file, JPL_quaternion_format=False)
     """
     with open(csv_file, 'r') as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        if skip_header:
+            next(csv_reader)
         time_stamped_poses = np.array(list(csv_reader))
         time_stamped_poses = time_stamped_poses.astype(float)
 
+    time_stamped_poses[:, 0] *= time_scale
     # Extract the quaternions from the poses.
     times = time_stamped_poses[:, 0].copy()
     poses = time_stamped_poses[:, 1:]
