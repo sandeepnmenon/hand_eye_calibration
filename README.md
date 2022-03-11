@@ -11,3 +11,6 @@ python compute_aligned_poses.py \
   --time_offset_output_csv_file time_offset.csv \
   --aligned_poses_output_numpy True
 ```
+
+## Visualize trajectories
+python visualisations/visualize_trajectories.py --imu_trajectory_filename imu_trajectory_filename --camera_trajectory_filename camera_trajectory_filename
