@@ -1,5 +1,8 @@
-# hand_eye_calibration
+# pose_alignment_module
 Code apapted from https://github.com/ethz-asl/hand_eye_calibration/blob/master/LICENSE to run as a python package without ROS or Catkin
+
+# certifiable_calibration
+Extrinsic calibration python code adapted from https://github.com/utiasSTARS/certifiable-calibration
 
 # Running code
 
@@ -12,5 +15,13 @@ python compute_aligned_poses.py \
   --aligned_poses_output_numpy True
 ```
 
+## Compute extrinsic calibration
+Change the path to the aligned poses file in ```T_vki_filename``` and ```T_cki_filename```
+```
+python nonoverlapping_hand_eye.py 
+```
+
 ## Visualize trajectories
 python visualisations/visualize_trajectories.py --imu_trajectory_filename imu_trajectory_filename --camera_trajectory_filename camera_trajectory_filename
+
+## Extrinsic calibration
