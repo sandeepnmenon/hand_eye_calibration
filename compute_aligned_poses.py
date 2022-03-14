@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-from hand_eye_calibration_module.time_alignment import (
+from pose_alignment_module.time_alignment import (
     calculate_time_offset, compute_aligned_poses, FilteringConfig)
-from hand_eye_calibration_module.quaternion import Quaternion
-from hand_eye_calibration_module.csv_io import (
+from pose_alignment_module.quaternion import Quaternion
+from pose_alignment_module.csv_io import (
     write_time_stamped_poses_to_csv_file,
     read_time_stamped_poses_from_csv_file,
     write_time_stamped_transformation_matrices)
@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
     if args.time_offset_output_csv_file is not None:
         print("Writing time_offset to %s." % args.time_offset_output_csv_file)
-        from hand_eye_calibration_module.csv_io import write_double_numpy_array_to_csv_file
+        from pose_alignment_module.csv_io import write_double_numpy_array_to_csv_file
         write_double_numpy_array_to_csv_file(np.array((time_offset, )),
                                              args.time_offset_output_csv_file)
 

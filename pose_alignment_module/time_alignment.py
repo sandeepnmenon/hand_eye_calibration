@@ -95,8 +95,8 @@ def resample_quaternions(times, quaternions, dt):
     Uses SLERP for quaternion interpolation.
     """
     interval = times[-1] - times[0]
-    print(times[0], times[-1], interval, dt, interval / dt + 1)
     samples = np.linspace(times[0], times[-1], int(interval / dt + 1))
+    print("samples len ", len(samples), times[0], times[-1], interval, dt)
     return (resample_quaternions_from_samples(times, quaternions, samples),
             samples)
 
@@ -243,6 +243,8 @@ def compute_aligned_poses(time_stamped_poses_A,
     # exist in either of the signals.
     dt_A = np.median(np.diff(time_stamped_poses_A_shifted[:, 0]))
     dt_B = np.median(np.diff(time_stamped_poses_B[:, 0]))
+    print("dt_A:", dt_A)
+    print("dt_B:", dt_B)
     if dt_A >= dt_B:
         dt = dt_A
         timestamps_low = time_stamped_poses_A_shifted[:, 0].T
@@ -251,7 +253,7 @@ def compute_aligned_poses(time_stamped_poses_A,
         dt = dt_B
         timestamps_low = time_stamped_poses_B[:, 0].T
         timestamps_high = time_stamped_poses_A_shifted[:, 0].T
-
+    
     # Create samples at time stamps from lower frequency signal, check if there
     # are timely close samples available from the other signal.
     # Interpolate the signals to match the time stamps of the low frequency
@@ -280,17 +282,17 @@ def compute_aligned_poses(time_stamped_poses_A,
         if ((timestamp - timestamps_high[left_idx]) < max_time_stamp_difference and
                 (timestamps_high[right_idx] - timestamp) <= max_time_stamp_difference):
             samples.append(timestamp)
-            continue
-
+            
     samples = np.array(samples)
-
     # Uncomment if you want to have equally spaced samples in time.
     # samples = np.linspace(start_time, end_time, interval / dt + 1)
-
+    print(len(time_stamped_poses_A_shifted), len(time_stamped_poses_B), len(samples))
+    print("samples:", samples[0:2])
     aligned_poses_A = interpolate_poses_from_samples(time_stamped_poses_A_shifted,
                                                      samples)
     aligned_poses_B = interpolate_poses_from_samples(time_stamped_poses_B,
                                                      samples)
+
     assert aligned_poses_A.shape == aligned_poses_B.shape
     assert np.allclose(aligned_poses_A[:, 0], aligned_poses_B[:, 0], atol=1e-8)
     print("Found {} matching poses.".format(aligned_poses_A.shape[0]))
