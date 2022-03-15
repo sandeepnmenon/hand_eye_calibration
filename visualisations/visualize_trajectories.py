@@ -25,7 +25,8 @@ def read_time_stamped_poses_from_csv_file(csv_file,  time_scale=1.0):
     times = time_stamped_poses[:, 0].copy()
     xyz = time_stamped_poses[:, 1:4].copy()
     quaternions = time_stamped_poses[:, 4:8].copy()
-    
+    print("Read {} poses from {}.".format(len(times), csv_file))
+
     return times, xyz, quaternions
 
 # Default values for local testing
