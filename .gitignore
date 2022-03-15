@@ -130,3 +130,5 @@ dmypy.json
 
 # Output files
 *.csv
+*.mat
+*.npy
