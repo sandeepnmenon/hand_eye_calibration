@@ -58,8 +58,9 @@ rot_noise = 0.01 #Percentage of rotation
 my_solver = solver()
 
 # Convert inertial poses to relative
-T_v_rel = inertial_to_relative(T_vki)
-T_c_rel = inertial_to_relative(T_cki)
+offset = 1
+T_v_rel = inertial_to_relative(T_vki, offset=offset)
+T_c_rel = inertial_to_relative(T_cki, offset=offset)
 # T_v_rel = T_vki
 # T_c_rel = T_cki
 
