@@ -21,16 +21,16 @@ def rotation_matrix_to_euler_angles(R):
         z = 0
     return np.array([math.degrees(x), math.degrees(y), math.degrees(z)])
 
-def get_extrinsic_params_from_transformation_matrix(transformation_matrix):
+def get_extrinsic_params_from_transformation_matrix(transformation_matrix, scale=1.0):
     [px, py, pz] = [transformation_matrix[0][3], transformation_matrix[1][3], transformation_matrix[2][3]]
     [roll, pitch, yaw] = rotation_matrix_to_euler_angles(transformation_matrix[np.ix_([0, 1, 2], [0, 1, 2])])
     return {
         'roll': roll,
         'pitch': pitch,
         'yaw': yaw,
-        'px': px,
-        'py': py,
-        'pz': pz,
+        'px': px*scale,
+        'py': py*scale,
+        'pz': pz*scale,
     }
 
 # Name the relevant filenames
@@ -59,8 +59,8 @@ my_solver = solver()
 
 # Convert inertial poses to relative
 offset = 1
-T_v_rel = inertial_to_relative(T_vki, offset=offset)
-T_c_rel = inertial_to_relative(T_cki, offset=offset)
+T_v_rel = inertial_to_relative(T_vki, offset=offset, reverse=True)
+T_c_rel = inertial_to_relative(T_cki, offset=offset, reverse=True)
 # T_v_rel = T_vki
 # T_c_rel = T_cki
 
@@ -89,9 +89,11 @@ print("Estimated Extrinsic Calibration:")
 print(dual_solution, relax_solution)
 
 if dual_flag:
+    estimated_scale = 1/dual_opt[3]
     print("Estimated Scale: {}".format(1/dual_opt[3]))
-    print("Dual solve: ", get_extrinsic_params_from_transformation_matrix(relax_solution))
+    print("Dual solve: ", get_extrinsic_params_from_transformation_matrix(dual_solution, estimated_scale[0]))
 if rel_flag:
+    estimated_scale = 1/relax_opt[3]
     print("Estimated Scale: {}".format(1/relax_opt[3]))
-    print("Relax solve: ", get_extrinsic_params_from_transformation_matrix(relax_solution))
-test=1
+    print("Relax solve: ", get_extrinsic_params_from_transformation_matrix(relax_solution, estimated_scale[0]))
+

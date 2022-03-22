@@ -18,6 +18,18 @@ def load_data_from_numpy(data_filename):
 
     return T
 
+def load_data_from_txt(data_filename):
+    raw_data = np.loadtxt(data_filename)
+    mat_list = []
+    for row in range(raw_data.shape[0]):
+        matrix = np.eye(4)
+        matrix[:3, :] = np.reshape(raw_data[row, :], (3, 4))
+        mat_list.append(matrix)
+    
+    T = [SE3.from_matrix(mat_list[i]) for i in range(len(mat_list))]
+    
+    return T
+
 def load_brookshire_data(data_filename):
     data_dict = sio.loadmat(data_filename)
     pose_array = data_dict['T_v_rel_list']
@@ -56,9 +68,13 @@ def results_loader(prefixes, dataset_name, constraints):
         data_dict[prefix] = prefix_dict
     return data_dict
 
-def inertial_to_relative(pose_list, offset=1):
+def inertial_to_relative(pose_list, offset=1, reverse=False):
     #Changes SE3 poses from relative to intertial to relative vs timestamps
-    rel_pose_list = [pose_list[i].dot(pose_list[i + offset].inv()) for i in range(0, len(pose_list) - offset, offset)] #This makes the poses T_{s_is_i+1}
+    if not reverse:
+        rel_pose_list = [pose_list[i].dot(pose_list[i + offset].inv()) for i in range(0, len(pose_list) - offset, offset)] #This makes the poses T_{s_is_i+1}
+    else:
+        rel_pose_list = [pose_list[i].inv().dot(pose_list[i + offset]) for i in range(0, len(pose_list) - offset, offset)] #This makes the poses T_{s_is_i+1}
+
     return rel_pose_list
 
 def inertial_to_relative_numpy(pose_list, offset=1):
